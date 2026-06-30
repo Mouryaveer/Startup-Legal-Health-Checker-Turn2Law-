@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS assessment_leads (
   phone TEXT,
   founder_name TEXT,
   pipeline_stage TEXT DEFAULT 'new' CHECK (pipeline_stage IN ('new','contacted','qualified','proposal','client','lost')),
+  assigned_to TEXT,
   notes JSONB DEFAULT '[]',
   tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT now(),

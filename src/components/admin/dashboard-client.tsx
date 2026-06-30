@@ -11,15 +11,20 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from "recharts";
 import { 
   ShieldAlert, 
   TrendingUp, 
-  Users, 
   FileSpreadsheet,
   ArrowRight,
-  TrendingDown
+  TrendingDown,
+  Percent,
+  CheckCircle,
+  HelpCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +47,7 @@ interface AdminDashboardClientProps {
   initialData: DashboardData | null;
 }
 
-// Mock data fallbacks for initial zero states / demo usage
+// Mock data for initial zero states / demo usage
 const mockSubmissions: Submission[] = [
   { id: "local-demo-1", company_name: "Aero Logistics", company_email: "ceo@aerolog.in", overall_score: 42, risk_level: "high", completed_at: new Date(Date.now() - 3600000 * 2).toISOString() },
   { id: "local-demo-2", company_name: "Curate Health", company_email: "founders@curate.co", overall_score: 87, risk_level: "low", completed_at: new Date(Date.now() - 3600000 * 12).toISOString() },
@@ -63,6 +68,29 @@ const mockTrends = [
   { name: "Week 2", assessments: 9, avgScore: 48 },
   { name: "Week 3", assessments: 15, avgScore: 56 },
   { name: "Week 4", assessments: 24, avgScore: 54 },
+];
+
+const mockIndustryScores = [
+  { name: "SaaS", avgScore: 68 },
+  { name: "FinTech", avgScore: 48 },
+  { name: "E-commerce", avgScore: 61 },
+  { name: "Healthcare", avgScore: 51 },
+  { name: "General", avgScore: 57 },
+];
+
+const mockCommonFailures = [
+  { document: "POSH Policy", rate: 82, color: "#DC2626" },
+  { document: "Founder Vesting Agreement", rate: 74, color: "#EA580C" },
+  { document: "Shareholders' Agreement (SHA)", rate: 68, color: "#D97706" },
+  { document: "IP Assignment Agreements", rate: 58, color: "#2563EB" },
+  { document: "DPDP Privacy Policy", rate: 49, color: "#16A34A" },
+];
+
+const mockFunnelData = [
+  { name: "Started Check", value: 120, fill: "#D8A04C" },
+  { name: "Selected Industry", value: 104, fill: "#E8BD6E" },
+  { name: "Halfway Completed", value: 84, fill: "#F5D69F" },
+  { name: "Completed Checklist", value: 54, fill: "#16A34A" },
 ];
 
 export function AdminDashboardClient({ initialData }: AdminDashboardClientProps) {
@@ -105,39 +133,46 @@ export function AdminDashboardClient({ initialData }: AdminDashboardClientProps)
   return (
     <div className="space-y-8">
       {/* Metric Grid Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Card 1 */}
-        <div className="glass-panel rounded-2xl p-6 flex items-center justify-between">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="glass-panel rounded-2xl p-5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">Total Audits Conducted</span>
-            <span className="text-3xl font-extrabold text-[#0A0A0A] block">{total}</span>
+            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">Total Audits</span>
+            <span className="text-2xl font-extrabold text-[#0A0A0A] block">{total}</span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#FDF8EF] border border-[#E8D5B0] flex items-center justify-center text-[#D8A04C]">
-            <FileSpreadsheet className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-[#FDF8EF] border border-[#E8D5B0] flex items-center justify-center text-[#D8A04C] shrink-0">
+            <FileSpreadsheet className="w-5.5 h-5.5" />
           </div>
         </div>
 
-        {/* Card 2 */}
-        <div className="glass-panel rounded-2xl p-6 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">Average Platform Score</span>
-            <span className="text-3xl font-extrabold text-[#D8A04C] block">{avgScore}/100</span>
+            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">Average Score</span>
+            <span className="text-2xl font-extrabold text-[#D8A04C] block">{avgScore}/100</span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#FDF8EF] border border-[#E8D5B0] flex items-center justify-center text-[#D8A04C]">
-            <TrendingUp className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-[#FDF8EF] border border-[#E8D5B0] flex items-center justify-center text-[#D8A04C] shrink-0">
+            <TrendingUp className="w-5.5 h-5.5" />
           </div>
         </div>
 
-        {/* Card 3 */}
-        <div className="glass-panel rounded-2xl p-6 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">Critical-risk ratio</span>
-            <span className="text-3xl font-extrabold text-red-600 block">
+            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">High Risk Ratio</span>
+            <span className="text-2xl font-extrabold text-red-600 block">
               {Math.round((submissions.filter((s) => s.overall_score < 40).length / submissions.length) * 100)}%
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600">
-            <ShieldAlert className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+            <ShieldAlert className="w-5.5 h-5.5" />
+          </div>
+        </div>
+
+        <div className="glass-panel rounded-2xl p-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-wider block">Completion Rate</span>
+            <span className="text-2xl font-extrabold text-green-600 block">45%</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center text-green-600 shrink-0">
+            <Percent className="w-5.5 h-5.5" />
           </div>
         </div>
       </div>
@@ -155,7 +190,7 @@ export function AdminDashboardClient({ initialData }: AdminDashboardClientProps)
               <BarChart data={mockScoreDistribution} margin={{ left: -30, right: 10 }}>
                 <XAxis dataKey="range" tick={{ fill: "#6B6B6B", fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: "#9B9B9B", fontSize: 9 }} axisLine={false} tickLine={false} />
-                <Tooltip cursor={{ fill: "rgba(216, 160, 76, 0.03)" }} />
+                <Tooltip cursor={{ fill: "rgba(216, 160, 76, 0.02)" }} />
                 <Bar dataKey="count" fill="#D8A04C" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -178,6 +213,74 @@ export function AdminDashboardClient({ initialData }: AdminDashboardClientProps)
                 <Line type="monotone" dataKey="avgScore" stroke="#8E5F28" strokeWidth={2} dot={{ fill: "#8E5F28" }} />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Advanced Analytics Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Industry Averages */}
+        <div className="glass-panel rounded-3xl p-6 space-y-4 lg:col-span-1">
+          <div>
+            <h3 className="text-sm font-bold text-[#0A0A0A]">Industry-Wise Averages</h3>
+            <p className="text-[10px] text-[#6B6B6B]">Comparing scores across business domains.</p>
+          </div>
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={mockIndustryScores} layout="vertical" margin={{ left: -10, right: 10 }}>
+                <XAxis type="number" domain={[0, 100]} tick={{ fill: "#9B9B9B", fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis dataKey="name" type="category" tick={{ fill: "#6B6B6B", fontSize: 9 }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="avgScore" fill="#E8BD6E" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Funnel Conversions */}
+        <div className="glass-panel rounded-3xl p-6 space-y-4 lg:col-span-1">
+          <div>
+            <h3 className="text-sm font-bold text-[#0A0A0A]">Assessment Completion Funnel</h3>
+            <p className="text-[10px] text-[#6B6B6B]">Friction mapping from starts to submissions.</p>
+          </div>
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={mockFunnelData} margin={{ left: -30, right: 10 }}>
+                <XAxis dataKey="name" tick={{ fill: "#6B6B6B", fontSize: 8 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#9B9B9B", fontSize: 9 }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="value" fill="#D8A04C" radius={[4, 4, 0, 0]}>
+                  {mockFunnelData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Common Failures Checklist */}
+        <div className="glass-panel rounded-3xl p-6 space-y-4 lg:col-span-1 flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-[#0A0A0A]">Common Gaps Identified</h3>
+            <p className="text-[10px] text-[#6B6B6B] mb-2">Failure rate metrics of critical documents.</p>
+          </div>
+          
+          <div className="space-y-3.5">
+            {mockCommonFailures.map((item) => (
+              <div key={item.document} className="space-y-1">
+                <div className="flex justify-between items-center text-[10px] font-semibold">
+                  <span className="text-[#3D3D3D] truncate max-w-[150px]">{item.document}</span>
+                  <span className="text-red-600 font-bold">{item.rate}% Missing</span>
+                </div>
+                <div className="w-full bg-[#E8E1D5]/40 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-red-500 h-full rounded-full"
+                    style={{ width: `${item.rate}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

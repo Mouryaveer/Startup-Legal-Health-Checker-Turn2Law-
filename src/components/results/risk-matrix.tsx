@@ -136,10 +136,13 @@ export function RiskMatrix({ risks }: RiskMatrixProps) {
                 {selectedRisk.riskLevel} Severity
               </span>
               <h4 className="text-sm font-bold text-[#0A0A0A] leading-snug">
-                {selectedRisk.questionText}
+                {selectedRisk.title}
               </h4>
-              <p className="text-xs text-[#6B6B6B] leading-relaxed">
-                {selectedRisk.recommendation}
+              <p className="text-[11px] text-[#6B6B6B] leading-relaxed">
+                <strong>Why it matters:</strong> {selectedRisk.whyItMatters}
+              </p>
+              <p className="text-[11px] text-[#6B6B6B] leading-relaxed">
+                <strong>Next step:</strong> {selectedRisk.nextStep}
               </p>
             </div>
 
