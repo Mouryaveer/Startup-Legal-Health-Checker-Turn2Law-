@@ -47,6 +47,7 @@ export function AssessmentWizard() {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [saveIndicator, setSaveIndicator] = useState<"idle" | "saving" | "saved">("idle");
+  const [dynamicQuestions, setDynamicQuestions] = useState<AssessmentQuestion[]>(questions);
 
   // Load state on mount
   useEffect(() => {
@@ -65,8 +66,40 @@ export function AssessmentWizard() {
       setSelectedIndustry(savedIndustry);
       setIsIndustrySelected(true);
     }
+
+    // Fetch dynamic questions from database rules API
+    const loadDbQuestions = async () => {
+      try {
+        const res = await fetch("/api/admin/questions");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const mapped = data.map((q: any) => ({
+              id: q.id,
+              category: q.category_slug,
+              categorySlug: q.category_slug,
+              text: q.text,
+              helpText: q.help_text,
+              type: q.type,
+              options: q.options,
+              weight: q.weight,
+              riskLevel: q.risk_level,
+              industryDependent: q.industry_dependent,
+              conditionalParentId: q.conditional_parent_id,
+              conditionalValue: q.conditional_value,
+              recommendation: q.recommendation,
+            }));
+            setDynamicQuestions(mapped);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load questions from database, using local static questions as fallback:", err);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
     
-    setIsLoaded(true);
+    loadDbQuestions();
   }, []);
 
   const saveAnswers = (newAnswers: Record<string, string | string[]>) => {
@@ -83,7 +116,7 @@ export function AssessmentWizard() {
   };
 
   // Filter active questions based on industry selection & skip logic
-  const activeQuestions = questions.filter((q) => {
+  const activeQuestions = dynamicQuestions.filter((q) => {
     // Check industry restriction
     if (q.industryDependent && q.industryDependent.length > 0) {
       if (!q.industryDependent.includes(selectedIndustry)) {
@@ -112,7 +145,7 @@ export function AssessmentWizard() {
   const currentQuestion = categoryQuestions[currentQuestionIndex];
 
   const handleSelectOption = (questionId: string, value: string) => {
-    const question = questions.find((q) => q.id === questionId);
+    const question = dynamicQuestions.find((q) => q.id === questionId);
     if (!question) return;
 
     if (question.type === "multi_choice") {

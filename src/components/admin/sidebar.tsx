@@ -16,7 +16,8 @@ import { cn } from "@/lib/utils";
 const sidebarLinks = [
   { href: "/admin", label: "Analytics Overview", icon: BarChart3 },
   { href: "/admin/leads", label: "Leads & CRM", icon: Users },
-  { href: "/admin/assessments", label: "Assessments", icon: FileCheck },
+  { href: "/admin/assessments", label: "Assessments Log", icon: FileCheck },
+  { href: "/admin/questions", label: "Rules Builder", icon: Settings },
 ];
 
 export function AdminSidebar() {
