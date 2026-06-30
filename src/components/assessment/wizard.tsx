@@ -336,7 +336,7 @@ export function AssessmentWizard() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
       {/* Sidebar navigation */}
-      <div className="lg:col-span-1 space-y-4">
+      <div className="hidden lg:block lg:col-span-1 space-y-4">
         <div className="glass-panel rounded-2xl p-5 space-y-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-[#8E5F28]">Assessment Categories</h2>
           <div className="space-y-2">
@@ -434,7 +434,28 @@ export function AssessmentWizard() {
       </div>
 
       {/* Main wizard workspace */}
-      <div className="lg:col-span-3 space-y-6">
+      <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+        {/* Mobile progress tracker */}
+        <div className="block lg:hidden glass-panel rounded-2xl p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs text-[#6B6B6B]">
+            <span className="font-bold text-[#0A0A0A]">{activeCategory.name}</span>
+            <span>{Math.round(overallProgress)}% Done</span>
+          </div>
+          <div className="w-full bg-[#E8E1D5]/50 h-1.5 rounded-full overflow-hidden">
+            <div 
+              className="bg-[#D8A04C] h-full transition-all duration-500" 
+              style={{ width: `${overallProgress}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-[10px] text-[#6B6B6B]">
+            <span>Question {currentQuestionIndex + 1} of {categoryQuestions.length}</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-[#D8A04C]" />
+              ~{estimatedTimeRemaining}m remaining
+            </span>
+          </div>
+        </div>
+
         {/* Reset Confirmation Overlay */}
         <AnimatePresence>
           {showConfirmReset && (
@@ -604,6 +625,23 @@ export function AssessmentWizard() {
             </button>
           </div>
         )}
+
+        {/* Mobile Reset & Info Panel */}
+        <div className="block lg:hidden text-center space-y-3 pt-2">
+          <div className="flex justify-between items-center text-[10px] text-[#6B6B6B] px-2 bg-[#F5F1EB]/30 p-2.5 rounded-xl border border-[#E8E1D5]/20">
+            <span className="flex items-center gap-1">
+              <FileCheck2 className="w-3.5 h-3.5 text-[#16A34A]" />
+              Auto-save: <strong className="text-green-600 font-semibold uppercase">Synced</strong>
+            </span>
+            <button
+              onClick={() => setShowConfirmReset(true)}
+              className="font-bold text-red-500 hover:text-red-700 hover:underline flex items-center gap-0.5"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Reset Assessment
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

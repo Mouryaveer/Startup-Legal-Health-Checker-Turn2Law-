@@ -253,7 +253,7 @@ export function ResultsClient({ results, companyName }: ResultsClientProps) {
                 >
                   <button
                     onClick={() => setOpenRecommendationIndex(isOpen ? null : index)}
-                    className="w-full flex items-center justify-between p-5 text-left focus-ring-gold rounded-2xl"
+                    className="w-full flex items-center justify-between p-4 sm:p-5 text-left focus-ring-gold rounded-2xl"
                     aria-expanded={isOpen}
                   >
                     <div className="flex items-center gap-3 pr-4">
@@ -279,7 +279,7 @@ export function ResultsClient({ results, companyName }: ResultsClientProps) {
                   </button>
 
                   {isOpen && (
-                    <div className="px-5 pb-5 pt-1 space-y-4 border-t border-[#E8E1D5]/40 animate-reveal-up">
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 space-y-4 border-t border-[#E8E1D5]/40 animate-reveal-up">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-3">
                         <div className="md:col-span-2 space-y-4">
                           <div className="space-y-1.5">
